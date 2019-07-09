@@ -28,6 +28,7 @@ struct UnknownPicosatException : public std::exception
 
 std::vector<int> solve(const std::vector<std::vector<int>> & cnf, unsigned seed, int verbose, unsigned long long prop_limit){
 	auto picosat = picosat_init();
+	int res;
 	// Set the random number generator seed
 	picosat_set_seed(picosat, seed);
 	// Set the verbosity level
@@ -46,7 +47,9 @@ std::vector<int> solve(const std::vector<std::vector<int>> & cnf, unsigned seed,
 		picosat_add(picosat,0);
 	}	
 	// now solve
-	auto res = picosat_sat(picosat, -1);
+	Py_BEGIN_ALLOW_THREADS // Release GIL
+	res = picosat_sat(picosat, -1);
+	Py_END_ALLOW_THREADS // Return GIL
 	auto max_idx = picosat_variables(picosat);
 	int v=0;
 	std::vector<int> result(max_idx,0);
@@ -69,6 +72,8 @@ std::vector<int> solve(const std::vector<std::vector<int>> & cnf, unsigned seed,
 			throw UnknownPicosatException();
 			break;
 	}
+	// Free memory
+	picosat_reset(picosat);
 	return result;
 }
 
