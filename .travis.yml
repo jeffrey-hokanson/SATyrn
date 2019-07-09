@@ -11,7 +11,7 @@ matrix:
 language: python
 
 install:
- - pip install pytest pycosat
+ - pip install pytest pybind11 
  - python setup.py install 
 
 script:
