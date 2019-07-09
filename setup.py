@@ -6,31 +6,6 @@ import copy
 import sysconfig
 from distutils.sysconfig import get_config_var
 
-install_requires = [
-		'numpy>=1.15', 
-		'scipy', 
-		'redis',
-		'cvxpy',
-		'cvxopt',
-		'tqdm',
-		'dask',
-		'distributed',
-		'sobol_seq',
-		'pycosat',
-	]
-
-if sys.version_info[0] < 3:
-	install_requires += [
-		'matplotlib<3.0.0',
-		# Required for python 2.7 from dask distributed
-		'tornado<6.0.0',
-		# LRU Cache
-		'backports.functools_lru_cache',
-		]
-else:
-	install_requires += [
-		'matplotlib',
-		]
 
 ###############################################################################
 # Generic Pybind11 setup config
@@ -144,14 +119,20 @@ def _get_distutils_temp_directory():
 												major=sys.version_info[0],
 												minor=sys.version_info[1]))
 
-picosat_so = 'picosat.o' 
-#+ get_config_var('EXT_SUFFIX')
-print('picosat', picosat_so)
-print(_get_distutils_temp_directory())
+
+# These are the additional object files 
+extra_objects = [
+	'satyrn/picosat/picosat.o',
+	]
+
+# This prefixes with the build location of these files 
+print(extra_objects)
+extra_objects = [ os.path.join(str(_get_distutils_temp_directory()), obj) for obj in extra_objects]
 
 ext_modules = [
+	# This module generates the object files for the c dependencies
 	Extension(
-		'picosat',
+		'fake',
 		['satyrn/picosat/picosat.c'],
 		include_dirs=['satyrn/picosat'],
 		language='c',
@@ -165,7 +146,7 @@ ext_modules = [
 			get_pybind_include(user=True)
 		],
 		language='c++', 
-		extra_objects = [_get_distutils_temp_directory() + '/satyrn/picosat/picosat.o' ],
+		extra_objects = extra_objects,
 		extra_compile_args = ['-Wall'],
 		#library_dirs=_get_distutils_build_directory(),
 		#extra_link_args = ['-rpath', _get_distutils_build_directory()],	
@@ -178,8 +159,9 @@ setup(name='satyrn',
 	author = 'Jeffrey M. Hokanson',
 	packages = ['satyrn'],
 	ext_modules=ext_modules,
-	install_requires = install_requires + ['pybind11>=2.3'],
+	install_requires = ['pybind11>=2.3'],
 	setup_requires=['pybind11>=2.3'],
+	tests_requires = ['pycosat'],
 	cmdclass={'build_ext': BuildExt},
 	zip_safe=False,
 	)

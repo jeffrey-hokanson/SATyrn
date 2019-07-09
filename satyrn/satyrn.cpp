@@ -1,28 +1,42 @@
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
+#include <assert.h>
 
+#include <exception>
 
 extern "C" { 
 #include "picosat/picosat.h" 
 };
 
-
-//#include "picosat.c"
-
 namespace py = pybind11;
 
 
-void print_vector(const std::vector<std::vector<int>> & v){
-	for (auto item : v){
-		for (auto item2 : item)
-			std::cout << item2 << "\t";
-		std::cout << "\n";
+
+struct UnsatisfiableException : public std::exception
+{
+	const char * what () const throw (){
+		return "SAT problem does not have a solution that satisfies the constraints";
 	}
-}
+};
+struct UnknownPicosatException : public std::exception
+{
+	const char * what () const throw (){
+		return "Unknown exception";
+	}
+};
 
 
-std::vector<int> solve(const std::vector<std::vector<int>> & cnf){
+std::vector<int> solve(const std::vector<std::vector<int>> & cnf, unsigned seed, int verbose, unsigned long long prop_limit){
 	auto picosat = picosat_init();
+	// Set the random number generator seed
+	picosat_set_seed(picosat, seed);
+	// Set the verbosity level
+	picosat_set_verbosity(picosat, verbose);
+	// Only set the propagation limit if it is non-zero
+	if (prop_limit)
+		picosat_set_propagation_limit(picosat, prop_limit);	
+
+	// Copy over the clauses into the solver
 	for (auto clause : cnf ){
 		// Add the current clause
 		for (auto v : clause){
@@ -34,19 +48,34 @@ std::vector<int> solve(const std::vector<std::vector<int>> & cnf){
 	// now solve
 	auto res = picosat_sat(picosat, -1);
 	auto max_idx = picosat_variables(picosat);
+	int v=0;
 	std::vector<int> result(max_idx,0);
+
 	
 	switch (res) {
-	case PICOSAT_SATISFIABLE:
-		for (int i=1; i<= max_idx; i++){
-			result[i-1] = picosat_deref(picosat, i);
-		}
+		case PICOSAT_SATISFIABLE:
+			for (int i=1; i<= max_idx; i++){
+				// Now copy over the results, following Pycosat
+				// https://github.com/ContinuumIO/pycosat/blob/b38fd85b6f4dcc18efd6027e96e5785104f53bb0/pycosat.c#L198
+				v = picosat_deref(picosat, i);
+				assert( v == -1 || v == 1);
+				result[i-1] = v*i;
+			}
+			break;
+		case PICOSAT_UNSATISFIABLE:
+			throw UnsatisfiableException();
+			break;
+		case PICOSAT_UNKNOWN:
+			throw UnknownPicosatException();
+			break;
 	}
 	return result;
 }
 
 
 PYBIND11_MODULE(satyrn, m){
-	m.def("print_vector", &print_vector, "print a vector");
-	m.def("solve", &solve, "solve a SAT problem");
+	m.def("solve", &solve, "solve a SAT problem",
+		py::arg("cnf"), py::arg("seed") = 0, py::arg("verbose") = 0, py::arg("prop_limit") = 0);
+	py::register_exception<UnsatisfiableException>(m, "UnsatisfiableException");
+	py::register_exception<UnknownPicosatException>(m, "UnknownPicosatException");
 }
