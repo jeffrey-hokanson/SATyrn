@@ -1,7 +1,6 @@
 from __future__ import print_function
 
 import satyrn
-import pycosat
 
 def check_solution(sol, cnf):
 	# Check that each clause is true

@@ -161,7 +161,7 @@ setup(name='satyrn',
 	ext_modules=ext_modules,
 	install_requires = ['pybind11>=2.3'],
 	setup_requires=['pybind11>=2.3'],
-	tests_requires = ['pycosat'],
+#	tests_requires = ['pycosat'],
 	cmdclass={'build_ext': BuildExt},
 	zip_safe=False,
 	)
