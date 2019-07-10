@@ -138,8 +138,8 @@ ext_modules = [
 		language='c',
 	),
 	Extension(
-		'satyrn',
-		['satyrn/satyrn.cpp'],
+		'picosat',
+		['satyrn/picosat/py_picosat.cpp'],
 		include_dirs=[
 			# Path to pybind11 headers
 			get_pybind_include(),
@@ -148,8 +148,6 @@ ext_modules = [
 		language='c++', 
 		extra_objects = extra_objects,
 		extra_compile_args = ['-Wall'],
-		#library_dirs=_get_distutils_build_directory(),
-		#extra_link_args = ['-rpath', _get_distutils_build_directory()],	
 	),
 ]
 
@@ -158,12 +156,12 @@ with open('README.md', 'r') as f:
 	long_description = f.read()
 
 setup(name='satyrn',
-	version = '0.2.1',
+	version = '0.3.0',
 	description = 'SAT Solver Interface',
 	long_description = long_description,
 	author = 'Jeffrey M. Hokanson',
 	author_email = 'jeffrey@hokanson.us',
-	packages = ['satyrn'],
+	packages = ['satyrn', 'satyrn.picosat'],
 	ext_modules=ext_modules,
 	install_requires = ['pybind11>=2.3'],
 	setup_requires=['pybind11>=2.3'],

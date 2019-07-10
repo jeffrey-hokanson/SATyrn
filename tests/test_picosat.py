@@ -1,6 +1,6 @@
 from __future__ import print_function
 
-import satyrn
+from satyrn import picosat
 
 def check_solution(sol, cnf):
 	# Check that each clause is true
@@ -19,7 +19,7 @@ def check_solution(sol, cnf):
 
 def test_solve():
 	cnf = [[1,-5,4],[-1,5,3,4], [-3, -4]]
-	sol = satyrn.solve(cnf, seed = 2)
+	sol = picosat.solve(cnf, seed = 2)
 	assert check_solution(sol, cnf)
 	print(sol)
 
@@ -28,24 +28,24 @@ def test_solve():
 def test_unsat():
 	cnf = [[1],[-1]]
 	try:
-		sol = satyrn.solve(cnf)
+		sol = picosat.solve(cnf)
 		assert False, "Incorrect exception raised"
-	except satyrn.UnsatisfiableException:
+	except picosat.UnsatisfiableException:
 		print("raised right exception")
 
 def test_short():
 	# This fails because the 
 	cnf = [[1,-5,4],[-1,5,3,4], [-3, -4]]
 	try:
-		sol = satyrn.solve(cnf, prop_limit = 1)
+		sol = picosat.solve(cnf, prop_limit = 1)
 		assert False, "Incorrect exception raised"
-	except satyrn.UnknownPicosatException:
+	except picosat.UnknownPicosatException:
 		print("raised right exception")
 		
 def test_itersolve():
 	cnf = [[1,-5,4],[-1,5,3,4], [-3, -4]]
 	all_sols = []
-	for sol in satyrn.itersolve(cnf):
+	for sol in picosat.itersolve(cnf):
 		print(sol)
 		assert check_solution(sol, cnf)
 		assert set(sol) not in all_sols, "Solution repeated"
@@ -55,7 +55,7 @@ def test_random():
 	cnf = [[20,],]
 	sols = []
 	for i in range(10):
-		sol = satyrn.solve(cnf, seed = i, initialization = 'random')
+		sol = picosat.solve(cnf, seed = i, initialization = 'random')
 		print(sol)
 		sol = set(sol)
 		if sol not in sols:

@@ -1,3 +1,8 @@
+/* Python interface to picosat 
+ * Jeffrey M. Hokanson, July 2019
+ */
+
+
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
 #include <assert.h>
@@ -5,7 +10,7 @@
 #include <exception>
 
 extern "C" { 
-#include "picosat/picosat.h" 
+#include "picosat.h" 
 };
 
 namespace py = pybind11;
@@ -170,7 +175,7 @@ std::vector<int> itersolve::next(){
 
 std::vector<std::vector<int>> empty;
 
-PYBIND11_MODULE(satyrn, m){
+PYBIND11_MODULE(picosat, m){
 	py::register_exception<UnsatisfiableException>(m, "UnsatisfiableException");
 	py::register_exception<UnknownPicosatException>(m, "UnknownPicosatException");
 	m.def("solve", &solve, "solve a SAT problem",
