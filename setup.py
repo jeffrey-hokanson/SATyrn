@@ -153,10 +153,16 @@ ext_modules = [
 	),
 ]
 
+
+with open('README.md', 'r') as f:
+	long_description = f.read()
+
 setup(name='satyrn',
-	version = '0.1',
+	version = '0.1.1',
 	description = 'SAT Solver Interface',
+	long_description = long_description,
 	author = 'Jeffrey M. Hokanson',
+	author_email = 'jeffrey@hokanson.us',
 	packages = ['satyrn'],
 	ext_modules=ext_modules,
 	install_requires = ['pybind11>=2.3'],
@@ -164,4 +170,13 @@ setup(name='satyrn',
 #	tests_requires = ['pycosat'],
 	cmdclass={'build_ext': BuildExt},
 	zip_safe=False,
+	license = 'MIT',
+	classifiers = [
+		'Development Status :: 3 - Alpha',
+		'Intended Audience :: Developers',
+		'License :: OSI Approved :: MIT License',
+	],
+	project_urls={ 
+		'Source': 'https://github.com/jeffrey-hokanson/SATyrn',
+		},
 	)
