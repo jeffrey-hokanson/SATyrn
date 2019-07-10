@@ -42,8 +42,18 @@ def test_short():
 	except satyrn.UnknownPicosatException:
 		print("raised right exception")
 		
+def test_itersolve():
+	cnf = [[1,-5,4],[-1,5,3,4], [-3, -4]]
+	all_sols = []
+	for sol in satyrn.itersolve(cnf):
+		print(sol)
+		assert check_solution(sol, cnf)
+		assert set(sol) not in all_sols, "Solution repeated"
+		all_sols.append(set(sol))
+
 
 if __name__ == '__main__':
-	test_solve()
+#	test_solve()
+	test_itersolve()
 #	test_unsat()	
 #	test_short()	
