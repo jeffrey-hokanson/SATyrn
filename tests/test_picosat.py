@@ -63,6 +63,16 @@ def test_random():
 	
 	assert len(sols) > 1, "Random solutions not generated"	
 
+	sols = []
+	for i in range(10):
+		sol = picosat.itersolve(cnf, initialization = 'random', seed = i).next()
+		print(sol)
+		sol = set(sol)
+		if sol not in sols:
+			sols.append(sol)
+	
+	assert len(sols) > 1, "Random solutions not generated"	
+
 
 if __name__ == '__main__':
 #	test_solve()
