@@ -158,7 +158,7 @@ with open('README.md', 'r') as f:
 	long_description = f.read()
 
 setup(name='satyrn',
-	version = '0.2.0',
+	version = '0.2.1',
 	description = 'SAT Solver Interface',
 	long_description = long_description,
 	author = 'Jeffrey M. Hokanson',

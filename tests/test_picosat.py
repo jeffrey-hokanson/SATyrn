@@ -51,9 +51,22 @@ def test_itersolve():
 		assert set(sol) not in all_sols, "Solution repeated"
 		all_sols.append(set(sol))
 
+def test_random():
+	cnf = [[20,],]
+	sols = []
+	for i in range(10):
+		sol = satyrn.solve(cnf, seed = i, initialization = 'random')
+		print(sol)
+		sol = set(sol)
+		if sol not in sols:
+			sols.append(sol)
+	
+	assert len(sols) > 1, "Random solutions not generated"	
+
 
 if __name__ == '__main__':
 #	test_solve()
-	test_itersolve()
+#	test_itersolve()
 #	test_unsat()	
 #	test_short()	
+	test_random()

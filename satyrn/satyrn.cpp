@@ -26,11 +26,28 @@ struct UnknownPicosatException : public std::exception
 };
 
 
-std::vector<int> solve(const std::vector<std::vector<int>> & cnf, unsigned seed, int verbose, unsigned long long prop_limit){
+std::vector<int> solve(const std::vector<std::vector<int>> & cnf, 
+	unsigned seed, 
+	int verbose, 
+	unsigned long long prop_limit,
+	const std::string &initialization
+){
 	auto picosat = picosat_init();
 	int res;
 	// Set the random number generator seed
 	picosat_set_seed(picosat, seed);
+	// Set initialization heuristic
+	if(initialization == "false")
+		picosat_set_global_default_phase(picosat, 0);
+	else if (initialization == "true")
+		picosat_set_global_default_phase(picosat, 1);
+	else if (initialization == "Jeroslow-Wang")
+		picosat_set_global_default_phase(picosat, 2);
+	else if (initialization == "random")
+		picosat_set_global_default_phase(picosat, 3);
+	else
+		throw std::invalid_argument("Invalid option given for initialization");
+	
 	// Set the verbosity level
 	picosat_set_verbosity(picosat, verbose);
 	// Only set the propagation limit if it is non-zero
@@ -148,7 +165,8 @@ PYBIND11_MODULE(satyrn, m){
 		py::arg("cnf"), 
 		py::arg("seed") = 0, 
 		py::arg("verbose") = 0, 
-		py::arg("prop_limit") = 0);
+		py::arg("prop_limit") = 0,
+		py::arg("initialization") = "Jeroslow-Wang");
 	py::class_<itersolve>(m, "itersolve")
 		.def(py::init< const std::vector<std::vector<int>>, unsigned, int, unsigned long long >(), 
 			py::arg("cnf"),
