@@ -97,13 +97,13 @@ std::vector<int> solve(const std::vector<std::vector<int>> & cnf,
 class itersolve {
 	PicoSAT * picosat;
 	public:
-	itersolve(const std::vector<std::vector<int>> & cnf, unsigned seed, int verbose, unsigned long long prop_limit);
+	itersolve(const std::vector<std::vector<int>> & cnf, unsigned seed, int verbose, unsigned long long prop_limit, const std::string &initialization);
 	std::vector<int> next();
 	~itersolve(){picosat_reset(picosat); };
 };
 
 
-itersolve::itersolve(const std::vector<std::vector<int>> & cnf, unsigned seed, int verbose, unsigned long long prop_limit){
+itersolve::itersolve(const std::vector<std::vector<int>> & cnf, unsigned seed, int verbose, unsigned long long prop_limit, const std::string &initialization){
 	picosat = picosat_init();		
 	// Set the random number generator seed
 	picosat_set_seed(picosat, seed);
@@ -112,6 +112,18 @@ itersolve::itersolve(const std::vector<std::vector<int>> & cnf, unsigned seed, i
 	// Only set the propagation limit if it is non-zero
 	if (prop_limit)
 		picosat_set_propagation_limit(picosat, prop_limit);	
+	
+	// Set initialization heuristic
+	if(initialization == "false")
+		picosat_set_global_default_phase(picosat, 0);
+	else if (initialization == "true")
+		picosat_set_global_default_phase(picosat, 1);
+	else if (initialization == "Jeroslow-Wang")
+		picosat_set_global_default_phase(picosat, 2);
+	else if (initialization == "random")
+		picosat_set_global_default_phase(picosat, 3);
+	else
+		throw std::invalid_argument("Invalid option given for initialization");
 	
 	// Copy over the clauses into the solver
 	for (auto clause : cnf ){
@@ -168,11 +180,12 @@ PYBIND11_MODULE(satyrn, m){
 		py::arg("prop_limit") = 0,
 		py::arg("initialization") = "Jeroslow-Wang");
 	py::class_<itersolve>(m, "itersolve")
-		.def(py::init< const std::vector<std::vector<int>>, unsigned, int, unsigned long long >(), 
+		.def(py::init< const std::vector<std::vector<int>>, unsigned, int, unsigned long long, const std::string  >(), 
 			py::arg("cnf"),
 			py::arg("seed") = 0,
 			py::arg("verbose") = 0,
-			py::arg("prop_limit") = 0
+			py::arg("prop_limit") = 0,
+			py::arg("initialization") = "Jeroslow-Wang"
 			)
 		.def("next", &itersolve::next, "get next item")  // Python2 compatability 
 		.def("__next__", &itersolve::next, "get next item")  // Python3
