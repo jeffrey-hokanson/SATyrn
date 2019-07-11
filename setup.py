@@ -6,7 +6,7 @@ import copy
 import sysconfig
 from distutils.sysconfig import get_config_var
 from distutils.ccompiler import new_compiler
-
+from distutils import ccompiler
 ###############################################################################
 # Generic Pybind11 setup config
 ###############################################################################
@@ -84,8 +84,16 @@ class BuildExt(build_ext):
 			opts.append('/DVERSION_INFO=\\"%s\\"' % self.distribution.get_version())
 	
 		# Compile C extensions
+		preargs = []
 		comp = new_compiler()
-		comp.compile(['satyrn/picosat/picosat.c'], include_dirs=['satyrn/picosat'], output_dir = _get_distutils_temp_directory() )		
+		if has_flag(comp, '-fPIC'):
+			preargs += ['-fPIC']
+
+		comp.compile(['satyrn/picosat/picosat.c'], 
+			include_dirs=['satyrn/picosat'], 
+			output_dir = _get_distutils_temp_directory(),
+			extra_preargs = preargs,
+			)		
 
 		for ext in self.extensions:
 			ext.extra_compile_args = copy.deepcopy(opts)
@@ -155,7 +163,7 @@ with open('README.md', 'r') as f:
 	long_description = f.read()
 
 setup(name='satyrn',
-	version = '0.3.3',
+	version = '0.3.4',
 	description = 'SAT Solver Interface',
 	long_description = long_description,
 	author = 'Jeffrey M. Hokanson',
