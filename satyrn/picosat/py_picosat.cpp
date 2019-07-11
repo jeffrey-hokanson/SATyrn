@@ -104,6 +104,8 @@ class itersolve {
 	public:
 	itersolve(const std::vector<std::vector<int>> & cnf, unsigned seed, int verbose, unsigned long long prop_limit, const std::string &initialization);
 	std::vector<int> next();
+	void add_clauses(const std::vector<std::vector<int>> & cnf);
+	void assume(const std::vector<int> & state);
 	~itersolve(){picosat_reset(picosat); };
 };
 
@@ -172,8 +174,26 @@ std::vector<int> itersolve::next(){
 	return result;
 }
 
+void itersolve::add_clauses(const std::vector<std::vector<int>> &cnf){
+	picosat_reset_phases(picosat);
+	// Copy over the clauses into the solver
+	for (auto clause : cnf ){
+		// Add the current clause
+		for (auto v : clause){
+			picosat_add(picosat, v);
+		}
+		// terminate with a zero
+		picosat_add(picosat,0);
+	}	
+}
 
-std::vector<std::vector<int>> empty;
+
+void itersolve::assume(const std::vector<int> & state){
+	for (int state_i : state)
+		picosat_assume(picosat, state_i);
+} 
+
+
 
 PYBIND11_MODULE(picosat, m){
 	py::register_exception<UnsatisfiableException>(m, "UnsatisfiableException");
@@ -194,5 +214,9 @@ PYBIND11_MODULE(picosat, m){
 			)
 		.def("next", &itersolve::next, "get next item")  // Python2 compatability 
 		.def("__next__", &itersolve::next, "get next item")  // Python3
+		.def("add_clauses", &itersolve::add_clauses, "add additional clauses to the solver")
+		.def("assume", &itersolve::assume, "adds assumptions")
 		.def("__iter__", [](const itersolve &s){ return &s;});
 }
+
+

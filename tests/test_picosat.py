@@ -51,6 +51,29 @@ def test_itersolve():
 		assert set(sol) not in all_sols, "Solution repeated"
 		all_sols.append(set(sol))
 
+
+def test_assumptions():
+	it = picosat.itersolve([[20]])
+	it.assume([1,2,3,4,5])
+	sol = it.next()
+	assert(all([sol[i] == i+1 for i in range(5)]))
+	
+
+
+def test_add():
+	cnf = [[1,-5,4],[-1,5,3,4], [-3, -4]]
+	cnf2 = [[ 2]]
+	it = picosat.itersolve(cnf)
+	it.add_clauses(cnf2)
+	sol = it.next()	
+	assert check_solution(sol, cnf + cnf2)
+
+	it = picosat.itersolve([[5]], initialization = 'random')
+	for i, sol in enumerate(it):
+		it.add_clauses([[4]])
+		if i > 0:
+			assert check_solution(sol, [[5],[4]])	
+
 def test_random():
 	cnf = [[20,],]
 	sols = []
@@ -64,14 +87,23 @@ def test_random():
 	assert len(sols) > 1, "Random solutions not generated"	
 
 	sols = []
+	sols2 = []
 	for i in range(10):
-		sol = picosat.itersolve(cnf, initialization = 'random', seed = i).next()
+		it = picosat.itersolve(cnf, initialization = 'random', seed = i)
+		sol = it.next()
 		print(sol)
 		sol = set(sol)
 		if sol not in sols:
 			sols.append(sol)
+
+		sol2 = it.next()
+		sol2 = set(sol2)
+		if sol2 not in sols2:
+			sols2.append(sol2)
+		
 	
 	assert len(sols) > 1, "Random solutions not generated"	
+	assert len(sols2) > 1, "Random solutions not generated"	
 
 
 if __name__ == '__main__':

@@ -5,7 +5,7 @@ from setuptools.command.build_ext import build_ext
 import copy
 import sysconfig
 from distutils.sysconfig import get_config_var
-
+from distutils.ccompiler import new_compiler
 
 ###############################################################################
 # Generic Pybind11 setup config
@@ -82,6 +82,11 @@ class BuildExt(build_ext):
 				opts.append('-fvisibility=hidden')
 		elif ct == 'msvc':
 			opts.append('/DVERSION_INFO=\\"%s\\"' % self.distribution.get_version())
+	
+		# Compile C extensions
+		comp = new_compiler()
+		comp.compile(['satyrn/picosat/picosat.c'], include_dirs=['satyrn/picosat'], output_dir = _get_distutils_temp_directory() )		
+
 		for ext in self.extensions:
 			ext.extra_compile_args = copy.deepcopy(opts)
 			# We've moved the CPP flag setting here so that it doesn't trigger when
@@ -132,12 +137,6 @@ extra_objects = [ os.path.join(str(_get_distutils_temp_directory()), obj) for ob
 ext_modules = [
 	# This module generates the object files for the c dependencies
 	Extension(
-		'fake',
-		['satyrn/picosat/picosat.c'],
-		include_dirs=['satyrn/picosat'],
-		language='c',
-	),
-	Extension(
 		'picosat',
 		['satyrn/picosat/py_picosat.cpp'],
 		include_dirs=[
@@ -156,7 +155,7 @@ with open('README.md', 'r') as f:
 	long_description = f.read()
 
 setup(name='satyrn',
-	version = '0.3.0',
+	version = '0.3.3',
 	description = 'SAT Solver Interface',
 	long_description = long_description,
 	author = 'Jeffrey M. Hokanson',
