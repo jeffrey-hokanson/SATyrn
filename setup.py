@@ -20,8 +20,17 @@ class get_pybind_include(object):
 		self.user = user
 
 	def __str__(self):
-		import pybind11
-		return pybind11.get_include(self.user)
+		# This below is the standard way to get the location of the headers 
+		#import pybind11
+		#return pybind11.get_include(self.user)
+		
+		# However for some reason on Linux systems, when running through pip
+		# importing pybind11 identifies different directories than when running through
+		# the python interpreter.  Hence, we run the interpter separately to identify 
+		# the correct directories 
+		import subprocess, sys
+		ret = subprocess.check_output([sys.executable, "-c", "import pybind11; print(pybind11.get_include(%s))" % self.user])
+		return str(ret).rstrip()
 
 
 
@@ -103,12 +112,8 @@ class BuildExt(build_ext):
 			 	ext.extra_compile_args += [cpp_flag(self.compiler)]
 			ext.extra_link_args = link_opts
 
-		print("Include dirs*********")
-		for d in self.include_dirs:
-			import os
-			print(d)
-			for i in os.listdir(d):
-				print("\t" + i)
+		print("Include dirs:", self.include_dirs)
+		
 		build_ext.build_extensions(self)
 
 ###############################################################################
@@ -169,7 +174,7 @@ with open('README.md', 'r') as f:
 	long_description = f.read()
 
 setup(name='satyrn',
-	version = '0.3.9',
+	version = '0.3.13',
 	description = 'SAT Solver Interface',
 	long_description = long_description,
 	long_description_content_type = 'text/markdown', 
@@ -191,4 +196,5 @@ setup(name='satyrn',
 	project_urls={ 
 		'Source': 'https://github.com/jeffrey-hokanson/SATyrn',
 		},
+	url = 'https://github.com/jeffrey-hokanson/SATyrn',
 	)

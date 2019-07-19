@@ -1,3 +1,4 @@
 include satyrn/picosat/picosat.h
+include satyrn/picosat/picosat.c
 include README.md
 
