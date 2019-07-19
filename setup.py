@@ -102,6 +102,9 @@ class BuildExt(build_ext):
 			if ext.language == 'c++':
 			 	ext.extra_compile_args += [cpp_flag(self.compiler)]
 			ext.extra_link_args = link_opts
+
+		print("Include dirs*********")
+		print(self.include_dirs)
 		build_ext.build_extensions(self)
 
 ###############################################################################
@@ -139,7 +142,6 @@ extra_objects = [
 	]
 
 # This prefixes with the build location of these files 
-print(extra_objects)
 extra_objects = [ os.path.join(str(_get_distutils_temp_directory()), obj) for obj in extra_objects]
 
 ext_modules = [
@@ -150,7 +152,7 @@ ext_modules = [
 		include_dirs=[
 			# Path to pybind11 headers
 			get_pybind_include(),
-	#		get_pybind_include(user=True)
+			get_pybind_include(user=True)
 		],
 		language='c++', 
 		extra_objects = extra_objects,
@@ -163,7 +165,7 @@ with open('README.md', 'r') as f:
 	long_description = f.read()
 
 setup(name='satyrn',
-	version = '0.3.5',
+	version = '0.3.6',
 	description = 'SAT Solver Interface',
 	long_description = long_description,
 	long_description_content_type = 'text/markdown', 
