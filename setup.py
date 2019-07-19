@@ -29,6 +29,12 @@ class get_pybind_include(object):
 		# the python interpreter.  Hence, we run the interpter separately to identify 
 		# the correct directories 
 		import subprocess, sys
+	
+		# https://github.com/pybind/python_example/issues/32#issuecomment-387037509	
+		if subprocess.call([sys.executable, '-m', 'pip', 'install', 'pybind11>=2.3'])
+			raise RuntimeError('pybind11 install failed')
+
+		# Find location
 		try:
 			ret = subprocess.check_output([sys.executable, "-c", "import pybind11; print(pybind11.get_include(%s))" % self.user],
 				universal_newlines = True)
@@ -178,7 +184,7 @@ with open('README.md', 'r') as f:
 	long_description = f.read()
 
 setup(name='satyrn',
-	version = '0.3.14',
+	version = '0.3.15',
 	description = 'SAT Solver Interface',
 	long_description = long_description,
 	long_description_content_type = 'text/markdown', 
