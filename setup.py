@@ -152,7 +152,7 @@ with open('README.md', 'r') as f:
 	long_description = f.read()
 
 setup(name='satyrn',
-	version = '0.3.16',
+	version = '0.3.17',
 	description = 'SAT Solver Interface',
 	long_description = long_description,
 	long_description_content_type = 'text/markdown', 
