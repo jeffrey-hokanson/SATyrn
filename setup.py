@@ -31,7 +31,7 @@ class get_pybind_include(object):
 		import subprocess, sys
 	
 		# https://github.com/pybind/python_example/issues/32#issuecomment-387037509	
-		if subprocess.call([sys.executable, '-m', 'pip', 'install', 'pybind11>=2.3'])
+		if subprocess.call([sys.executable, '-m', 'pip', 'install', 'pybind11>=2.3']):
 			raise RuntimeError('pybind11 install failed')
 
 		# Find location
