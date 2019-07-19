@@ -7,41 +7,10 @@ import sysconfig
 from distutils.sysconfig import get_config_var
 from distutils.ccompiler import new_compiler
 from distutils import ccompiler
+
 ###############################################################################
 # Generic Pybind11 setup config
 ###############################################################################
-class get_pybind_include(object):
-	"""Helper class to determine the pybind11 include path
-	The purpose of this class is to postpone importing pybind11
-	until it is actually installed, so that the ``get_include()``
-	method can be invoked. """
-
-	def __init__(self, user=False):
-		self.user = user
-
-	def __str__(self):
-		# This below is the standard way to get the location of the headers 
-		#import pybind11
-		#return pybind11.get_include(self.user)
-		
-		# However for some reason on Linux systems, when running through pip
-		# importing pybind11 identifies different directories than when running through
-		# the python interpreter.  Hence, we run the interpter separately to identify 
-		# the correct directories 
-		import subprocess, sys
-	
-		# https://github.com/pybind/python_example/issues/32#issuecomment-387037509	
-		if subprocess.call([sys.executable, '-m', 'pip', 'install', 'pybind11>=2.3']):
-			raise RuntimeError('pybind11 install failed')
-
-		# Find location
-		try:
-			ret = subprocess.check_output([sys.executable, "-c", "import pybind11; print(pybind11.get_include(%s))" % self.user],
-				universal_newlines = True)
-			return str(ret).rstrip()
-		except:
-			return ''
-
 
 
 
@@ -170,8 +139,7 @@ ext_modules = [
 		['satyrn/picosat/py_picosat.cpp'],
 		include_dirs=[
 			# Path to pybind11 headers
-			get_pybind_include(),
-			get_pybind_include(user=True)
+			'pybind11/include',
 		],
 		language='c++', 
 		extra_objects = extra_objects,
@@ -184,7 +152,7 @@ with open('README.md', 'r') as f:
 	long_description = f.read()
 
 setup(name='satyrn',
-	version = '0.3.15',
+	version = '0.3.16',
 	description = 'SAT Solver Interface',
 	long_description = long_description,
 	long_description_content_type = 'text/markdown', 

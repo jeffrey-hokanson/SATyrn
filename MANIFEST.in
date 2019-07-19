@@ -1,4 +1,4 @@
 include satyrn/picosat/picosat.h
 include satyrn/picosat/picosat.c
 include README.md
-
+include pybind11/include/pybind11/*.h
