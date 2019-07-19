@@ -109,9 +109,6 @@ class BuildExt(build_ext):
 			print(d)
 			for i in os.listdir(d):
 				print("\t" + i)
-			print(d + "/pybind11")
-			for i in os.listdir(d + '/pybind11/'):
-				print("\t" + i)
 		build_ext.build_extensions(self)
 
 ###############################################################################
@@ -172,7 +169,7 @@ with open('README.md', 'r') as f:
 	long_description = f.read()
 
 setup(name='satyrn',
-	version = '0.3.8',
+	version = '0.3.9',
 	description = 'SAT Solver Interface',
 	long_description = long_description,
 	long_description_content_type = 'text/markdown', 
