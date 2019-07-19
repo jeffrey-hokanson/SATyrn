@@ -29,8 +29,12 @@ class get_pybind_include(object):
 		# the python interpreter.  Hence, we run the interpter separately to identify 
 		# the correct directories 
 		import subprocess, sys
-		ret = subprocess.check_output([sys.executable, "-c", "import pybind11; print(pybind11.get_include(%s))" % self.user])
-		return str(ret).rstrip()
+		try:
+			ret = subprocess.check_output([sys.executable, "-c", "import pybind11; print(pybind11.get_include(%s))" % self.user],
+				universal_newlines = True)
+			return str(ret).rstrip()
+		except:
+			return ''
 
 
 
