@@ -104,7 +104,14 @@ class BuildExt(build_ext):
 			ext.extra_link_args = link_opts
 
 		print("Include dirs*********")
-		print(self.include_dirs)
+		for d in self.include_dirs:
+			import os
+			print(d)
+			for i in os.listdir(d):
+				print("\t" + i)
+			print(d + "/pybind11")
+			for i in os.listdir(d + '/pybind11/'):
+				print("\t" + i)
 		build_ext.build_extensions(self)
 
 ###############################################################################
@@ -165,7 +172,7 @@ with open('README.md', 'r') as f:
 	long_description = f.read()
 
 setup(name='satyrn',
-	version = '0.3.6',
+	version = '0.3.8',
 	description = 'SAT Solver Interface',
 	long_description = long_description,
 	long_description_content_type = 'text/markdown', 
